@@ -15,19 +15,19 @@ public class VisualHost : Canvas
     protected override Visual GetVisualChild(int index) => _visuals.ElementAt(index);
     protected override int VisualChildrenCount => _visuals.Count;
 
-    public IEnumerable<StrokeElement> ItemsSource
+    public IEnumerable<Visual> ItemsSource
     {
-        get => (IEnumerable<StrokeElement>)GetValue(ItemsSourceProperty);
+        get => (IEnumerable<Visual>)GetValue(ItemsSourceProperty);
         set => SetValue(ItemsSourceProperty, value);
     }
     public static readonly DependencyProperty ItemsSourceProperty =
-        DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable<StrokeElement>), typeof(VisualHost), new PropertyMetadata(OnItemsSourceChangedCallback));
+        DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable<Visual>), typeof(VisualHost), new PropertyMetadata(OnItemsSourceChangedCallback));
 
     private static void OnItemsSourceChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is not VisualHost host) return;
         host.Clear();
-        host.AddVisualRange((IEnumerable<StrokeElement>)e.NewValue);
+        host.AddVisualRange((IEnumerable<Visual>)e.NewValue);
         host.CreateItemsSourceSubscription();
     }
     public VisualHost()
@@ -56,21 +56,32 @@ public class VisualHost : Canvas
         handler => notifyCollection.CollectionChanged -= handler)
         .Subscribe(e =>
         {
-            var s = e.EventArgs.NewItems;
-            if(e.EventArgs.NewItems?.OfType<Visual>() is { } addRange)
+            switch (e.EventArgs.Action)
             {
-                foreach (var item in addRange)
-                {
-                    AddVisual(item);
-                }
-            }
+                case NotifyCollectionChangedAction.Add:
+                    if (e.EventArgs.NewItems?.OfType<Visual>() is { } addRange)
+                    {
+                        foreach (var item in addRange)
+                        {
+                            AddVisual(item);
+                        }
+                    }
+                    break;
 
-            if (e.EventArgs.OldItems?.OfType<Visual>() is { } oldRange)
-            {
-                foreach (var item in oldRange)
+                case NotifyCollectionChangedAction.Remove:
+                    if (e.EventArgs.OldItems?.OfType<Visual>() is not { } oldRange) return;
                 {
-                    DeleteVisual(item);
+                    foreach (var item in oldRange)
+                    {
+                        DeleteVisual(item);
+                    }
                 }
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    this.Clear();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         });
     }
@@ -102,10 +113,19 @@ public class VisualHost : Canvas
 
     public void Clear()
     {
-        for (int i = 0; i < _visuals.Count; i++)
+        // 倒着删除或者这样删除!!!
+        var v = _visuals.ToArray();
+        foreach (var t in v)
         {
-            DeleteVisual(_visuals[i]);
+            DeleteVisual(t);
         }
+        // var count = _visuals.Count;
+        // for (int i = 0; i < count; i++)
+        // {
+        //     var lst = _visuals[count - i - 1];
+        //     DeleteVisual(lst);
+        //     Console.WriteLine(count - i - 1);
+        // }
     }
 
     public void AddVisualRange(IEnumerable<Visual> visuals)

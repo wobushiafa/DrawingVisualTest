@@ -11,8 +11,7 @@
     <local:VisualHost ItemsSource="{Binding Strokes}" 
                       Background="AliceBlue"
                       MouseDown="VisualHost_MouseDown"
-                      MouseMove="VisualHost_MouseMove"
-                      />
+                      MouseMove="VisualHost_MouseMove"/>
 
     <StackPanel>
       <Button Width="120" Height="34" Click="Button_Click"/>

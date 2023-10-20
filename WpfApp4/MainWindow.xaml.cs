@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Ink;
 using System.Windows.Media;
 
 namespace WpfApp4
@@ -23,18 +22,18 @@ namespace WpfApp4
             this.DataContext = _mainViewModel;
             this.Loaded += (_, _) =>
             {
-                //Random random = new Random();
-                //for (int i = 0; i < 1000; i++)
-                //{
-                //    var stroke = new StrokeElement();
-                //    var points = new List<Point>();
-                //    for (int j = 0; j < 100; j++)
-                //    {
-                //        points.Add(new Point(random.Next(0, 1920), random.Next(0, 1080)));
-                //    }
-                //    stroke.Points = points;
-                //    _mainViewModel.Strokes.Add(stroke);
-                //}
+                /*Random random = new Random();
+                for (int i = 0; i < 1000; i++)
+                {
+                    var stroke = new StrokeElement();
+                    var points = new List<Point>();
+                    for (int j = 0; j < 100; j++)
+                    {
+                        points.Add(new Point(random.Next(0, 1920), random.Next(0, 1080)));
+                    }
+                    stroke.Points = points;
+                    _mainViewModel.Strokes.Add(stroke);
+                }*/
             };
         }
 
@@ -49,11 +48,12 @@ namespace WpfApp4
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            var collection = _mainViewModel.Strokes.Skip(50);
-            for (int i = 0; i < collection.Count(); i++)
-            {
-                collection.ElementAt(i).Stroke = Brushes.White;
-            }
+            // var collection = _mainViewModel.Strokes.Skip(50);
+            // for (int i = 0; i < collection.Count(); i++)
+            // {
+            //     collection.ElementAt(i).Stroke = Brushes.White;
+            // }
+            _mainViewModel.Strokes.Clear();
         }
 
         private StrokeElement stroke;
